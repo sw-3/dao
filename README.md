@@ -1,13 +1,10 @@
-# Sample Hardhat Project
+# Sample DAO Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project demonstrates a basic DAO contract with a front end.
 
-Try running some of the following tasks:
+## Technologies Used
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+* Hardhat
+* ethers.js
+* solidity
+* react & react-bootstrap
