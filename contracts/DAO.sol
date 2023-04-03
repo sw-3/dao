@@ -37,25 +37,40 @@ contract DAO {
     // allow contract to receive ether
     receive() external payable {}
 
+    modifier onlyInvestor() {
+        require(
+            Token(token).balanceOf(msg.sender) > 0,
+            "must be token holder"
+        );
+        _;
+    }
+
     function createProposal(
         string memory _name, 
         uint256 _amount, 
         address payable _recipient
-    ) external {
+    ) external onlyInvestor {
+
+        require(address(this).balance >= _amount);
+
         proposalCount++;
 
         // create a proposal in the mapping
-        proposals[proposalCount] =
-            Proposal(
-                proposalCount,
-                _name,
-                _amount,
-                _recipient,
-                0,
-                false
-            );
+        proposals[proposalCount] = Proposal(
+            proposalCount,
+            _name,
+            _amount,
+            _recipient,
+            0,
+            false
+        );
 
-        emit Propose(proposalCount, _amount, _recipient, msg.sender);
+        emit Propose(
+            proposalCount,
+            _amount,
+            _recipient,
+            msg.sender
+        );
     }
 
 }
