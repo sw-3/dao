@@ -21,12 +21,19 @@ contract DAO {
     uint256 public proposalCount;
 
     mapping(uint256 => Proposal) public proposals;
+    mapping(address => mapping(uint256 => bool)) votes;
 
     event Propose(
         uint id,
         uint256 amount,
         address recipient,
-        address creator);
+        address creator
+    );
+
+    event Vote(
+        uint256 id,
+        address investor
+    );
 
     constructor (Token _token, uint256 _quorum) {
         owner = msg.sender;
@@ -39,7 +46,7 @@ contract DAO {
 
     modifier onlyInvestor() {
         require(
-            Token(token).balanceOf(msg.sender) > 0,
+            token.balanceOf(msg.sender) > 0,
             "must be token holder"
         );
         _;
@@ -71,6 +78,25 @@ contract DAO {
             _recipient,
             msg.sender
         );
+    }
+
+    function vote(uint256 _id) external onlyInvestor {
+
+        // fetch the proposal from the mapping
+        // NOTE: 'storage' causes any updates to be stored back in mapping
+        Proposal storage proposal = proposals[_id];
+
+        // prevent double-voting
+        require(!votes[msg.sender][_id], "Already voted.");
+
+        // update votes
+        proposal.votes += token.balanceOf(msg.sender);
+
+        // track that investor has voted
+        votes[msg.sender][_id] = true;
+
+        // emit an event
+        emit Vote(_id, msg.sender);
     }
 
 }
