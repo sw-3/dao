@@ -35,6 +35,10 @@ contract DAO {
         address investor
     );
 
+    event Finalize(
+        uint256 id
+    );
+
     constructor (Token _token, uint256 _quorum) {
         owner = msg.sender;
         token = _token;
@@ -106,16 +110,25 @@ contract DAO {
         // fetch the proposal
         Proposal storage proposal = proposals[_id];
 
+        // ensure proposal is not already finalized
+        require(proposal.finalized == false, "proposal already finalized");
+
         // mark proposal as finalized
         proposal.finalized = true;
 
         // check that proposal has enough votes
+        require(proposal.votes >= quorum, "must reach quorum to finalize proposal");
 
+        // check that contract has enough ether
+        require(address(this).balance >= proposal.amount);
 
         // tranfer funds
-
+        // NOTE: below "call" method is better than proposal.recipient.transfer(proposal.amount);
+        //       bcause we can check teh result in sent
+        (bool sent, ) = proposal.recipient.call{ value: proposal.amount}("");
+        require(sent);
 
         // emit an event
-
+        emit Finalize(_id);
     }
 }
