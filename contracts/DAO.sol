@@ -80,6 +80,7 @@ contract DAO {
         );
     }
 
+    // vote on proposal
     function vote(uint256 _id) external onlyInvestor {
 
         // fetch the proposal from the mapping
@@ -99,4 +100,22 @@ contract DAO {
         emit Vote(_id, msg.sender);
     }
 
+    // finalize proposal
+    function finalizeProposal(uint256 _id) external onlyInvestor {
+
+        // fetch the proposal
+        Proposal storage proposal = proposals[_id];
+
+        // mark proposal as finalized
+        proposal.finalized = true;
+
+        // check that proposal has enough votes
+
+
+        // tranfer funds
+
+
+        // emit an event
+
+    }
 }
