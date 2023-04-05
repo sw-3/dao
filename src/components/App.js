@@ -78,6 +78,12 @@ function App() {
         <Loading />
       ) : (
         <>
+          <Create
+            provider={provider}
+            dao={dao}
+            setIsLoading={setIsLoading}
+          />
+
           <hr />
 
           <p className='text-center'>
