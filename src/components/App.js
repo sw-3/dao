@@ -3,8 +3,10 @@ import { Container } from 'react-bootstrap'
 import { ethers } from 'ethers'
 
 // Components
-import Navigation from './Navigation';
-import Loading from './Loading';
+import Navigation from './Navigation'
+import Create from './Create'
+import Proposals from './Proposals'
+import Loading from './Loading'
 
 // ABIs: Import your contract ABIs here
 import DAO_ABI from '../abis/DAO.json'
@@ -78,9 +80,18 @@ function App() {
         <>
           <hr />
 
-          <p className='text-center'><strong>Treasury Balance:</strong> {treasuryBalance} ETH</p>
+          <p className='text-center'>
+            <strong>Treasury Balance:</strong> {treasuryBalance} ETH</p>
 
           <hr />
+
+          <Proposals 
+            provider={provider}
+            dao={dao}
+            proposals={proposals}
+            quorum={quorum}
+            setIsLoading={setIsLoading}
+          />
         </>
       )}
     </Container>
