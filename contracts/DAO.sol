@@ -14,14 +14,15 @@ contract DAO {
         string name;
         uint256 amount;
         address payable recipient;
-        uint256 votes;
+        uint256[3] votes;   // array: For, Against, Abstain
         bool finalized;
+        bool passed;
     }
 
     uint256 public proposalCount;
 
     mapping(uint256 => Proposal) public proposals;
-    mapping(address => mapping(uint256 => bool)) votes;
+    mapping(address => mapping(uint256 => bool)) hasVoted;
 
     event Propose(
         uint id,
@@ -36,7 +37,8 @@ contract DAO {
     );
 
     event Finalize(
-        uint256 id
+        uint256 id,
+        bool passed
     );
 
     constructor (Token _token, uint256 _quorum) {
@@ -67,15 +69,30 @@ contract DAO {
         proposalCount++;
 
         // create a proposal in the mapping
-        proposals[proposalCount] = Proposal(
+        Proposal memory p;
+
+        p.id = proposalCount;
+        p.name = _name;
+        p.amount = _amount;
+        p.recipient = _recipient;
+        p.finalized = false;
+        p.passed = false;
+        p.votes[0] = 0;
+        p.votes[1] = 0;
+        p.votes[2] = 0;
+
+        proposals[proposalCount] = p;
+
+/*         proposals[proposalCount] = Proposal(
             proposalCount,
             _name,
             _amount,
             _recipient,
-            0,
+            [0,0,0],
+            false,
             false
         );
-
+*/
         emit Propose(
             proposalCount,
             _amount,
@@ -85,20 +102,24 @@ contract DAO {
     }
 
     // vote on proposal
-    function vote(uint256 _id) external onlyInvestor {
+    function vote(
+        uint256 _id,
+        uint8 _voteType
+        ) 
+        external onlyInvestor {
 
         // fetch the proposal from the mapping
         // NOTE: 'storage' causes any updates to be stored back in mapping
         Proposal storage proposal = proposals[_id];
 
         // prevent double-voting
-        require(!votes[msg.sender][_id], "Already voted.");
+        require(!hasVoted[msg.sender][_id], "Already voted.");
 
         // update votes
-        proposal.votes += token.balanceOf(msg.sender);
+        proposal.votes[_voteType] += token.balanceOf(msg.sender);
 
         // track that investor has voted
-        votes[msg.sender][_id] = true;
+        hasVoted[msg.sender][_id] = true;
 
         // emit an event
         emit Vote(_id, msg.sender);
@@ -113,22 +134,37 @@ contract DAO {
         // ensure proposal is not already finalized
         require(proposal.finalized == false, "proposal already finalized");
 
+        // check that proposal has a quorum
+        require(
+            proposal.votes[0]+proposal.votes[1]+proposal.votes[2] >= quorum, 
+            "must reach quorum to finalize proposal"
+        );
+
+        // check that contract has enough ether
+        require(
+            address(this).balance >= proposal.amount,
+            "not enough funds in contract to finalize"
+        );
+
+        // check that proposal passes
+        if (proposal.votes[0] > proposal.votes[1]) {
+            // proposal passes
+            // transfer funds with "call" method to allow checking result
+            (bool sent, ) = proposal.recipient.call{ value: proposal.amount }("");
+
+            // require successful funds transfer to finalize
+            require(sent, "funds failed to transfer - not finalized");
+
+            proposal.passed = true;
+        }
+        else {
+            proposal.passed = false;
+        }
+
         // mark proposal as finalized
         proposal.finalized = true;
 
-        // check that proposal has enough votes
-        require(proposal.votes >= quorum, "must reach quorum to finalize proposal");
-
-        // check that contract has enough ether
-        require(address(this).balance >= proposal.amount);
-
-        // tranfer funds
-        // NOTE: below "call" method is better than proposal.recipient.transfer(proposal.amount);
-        //       bcause we can check teh result in sent
-        (bool sent, ) = proposal.recipient.call{ value: proposal.amount}("");
-        require(sent);
-
         // emit an event
-        emit Finalize(_id);
+        emit Finalize(_id, proposal.passed);
     }
 }
