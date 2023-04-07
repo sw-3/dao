@@ -14,7 +14,9 @@ contract DAO {
         string name;
         uint256 amount;
         address payable recipient;
-        uint256[3] votes;   // array: For, Against, Abstain
+        uint256 votesFor;
+        uint256 votesAgainst;
+        uint256 votesAbstain;
         bool finalized;
         bool passed;
     }
@@ -23,6 +25,8 @@ contract DAO {
 
     mapping(uint256 => Proposal) public proposals;
     mapping(address => mapping(uint256 => bool)) hasVoted;
+
+    enum VoteType { For, Against, Abstain }
 
     event Propose(
         uint id,
@@ -33,7 +37,8 @@ contract DAO {
 
     event Vote(
         uint256 id,
-        address investor
+        address investor,
+        VoteType vote
     );
 
     event Finalize(
@@ -69,30 +74,17 @@ contract DAO {
         proposalCount++;
 
         // create a proposal in the mapping
-        Proposal memory p;
 
-        p.id = proposalCount;
-        p.name = _name;
-        p.amount = _amount;
-        p.recipient = _recipient;
-        p.finalized = false;
-        p.passed = false;
-        p.votes[0] = 0;
-        p.votes[1] = 0;
-        p.votes[2] = 0;
-
-        proposals[proposalCount] = p;
-
-/*         proposals[proposalCount] = Proposal(
+        proposals[proposalCount] = Proposal(
             proposalCount,
             _name,
             _amount,
             _recipient,
-            [0,0,0],
+            0, 0, 0,
             false,
             false
         );
-*/
+
         emit Propose(
             proposalCount,
             _amount,
@@ -104,7 +96,7 @@ contract DAO {
     // vote on proposal
     function vote(
         uint256 _id,
-        uint8 _voteType
+        VoteType _voteType
         ) 
         external onlyInvestor {
 
@@ -116,13 +108,27 @@ contract DAO {
         require(!hasVoted[msg.sender][_id], "Already voted.");
 
         // update votes
-        proposal.votes[_voteType] += token.balanceOf(msg.sender);
+        uint256 tokenBalance = token.balanceOf(msg.sender);
+
+        if(_voteType == VoteType.For) {
+            proposal.votesFor += tokenBalance;
+        }
+        else if (_voteType == VoteType.Against) {
+            proposal.votesAgainst += tokenBalance;
+        }
+        else if (_voteType == VoteType.Abstain) {
+            proposal.votesAbstain += tokenBalance;
+        }
+        else {
+            // invalid Vote Type! this should never happen... bail!
+            require(false);
+        }
 
         // track that investor has voted
         hasVoted[msg.sender][_id] = true;
 
         // emit an event
-        emit Vote(_id, msg.sender);
+        emit Vote(_id, msg.sender, _voteType);
     }
 
     // finalize proposal
@@ -136,7 +142,8 @@ contract DAO {
 
         // check that proposal has a quorum
         require(
-            proposal.votes[0]+proposal.votes[1]+proposal.votes[2] >= quorum, 
+            proposal.votesFor + proposal.votesAgainst + proposal.votesAbstain
+            >= quorum,
             "must reach quorum to finalize proposal"
         );
 
@@ -147,7 +154,7 @@ contract DAO {
         );
 
         // check that proposal passes
-        if (proposal.votes[0] > proposal.votes[1]) {
+        if (proposal.votesFor > proposal.votesAgainst) {
             // proposal passes
             // transfer funds with "call" method to allow checking result
             (bool sent, ) = proposal.recipient.call{ value: proposal.amount }("");
