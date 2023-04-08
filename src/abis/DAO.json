@@ -23,6 +23,12 @@
         "internalType": "uint256",
         "name": "id",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "passed",
+        "type": "bool"
       }
     ],
     "name": "Finalize",
@@ -73,6 +79,12 @@
         "internalType": "address",
         "name": "investor",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum DAO.VoteType",
+        "name": "vote",
+        "type": "uint8"
       }
     ],
     "name": "Vote",
@@ -159,12 +171,27 @@
       },
       {
         "internalType": "uint256",
-        "name": "votes",
+        "name": "votesFor",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "votesAgainst",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "votesAbstain",
         "type": "uint256"
       },
       {
         "internalType": "bool",
         "name": "finalized",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "passed",
         "type": "bool"
       }
     ],
@@ -203,6 +230,11 @@
         "internalType": "uint256",
         "name": "_id",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum DAO.VoteType",
+        "name": "_voteType",
+        "type": "uint8"
       }
     ],
     "name": "vote",
