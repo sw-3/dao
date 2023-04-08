@@ -14,14 +14,25 @@ const tokens = (n) => {
 const ether = tokens
 
 async function main() {
+
+  const VoteType = {
+    For: 0,
+    Against: 1,
+    Abstain: 2
+  }
+
   console.log(`Fetching accounts & network...\n`)
 
   const accounts = await ethers.getSigners()
-  const funder = accounts[0]
-  const investor1 = accounts[1]
+  const deployer = accounts[0]
+  const funder = accounts[1]
+  const investor1 = accounts[1] // investor1 is also funder
   const investor2 = accounts[2]
   const investor3 = accounts[3]
-  const recipient = accounts[4]
+  const investor4 = accounts[4]
+  const investor5 = accounts[5] // investor5 is also recipient
+  const recipient = accounts[5]
+  const user = accounts[6]
 
   let transaction
 
@@ -35,13 +46,19 @@ async function main() {
   console.log(`Token fetched: ${token.address}\n`)
 
   // Send tokens to investors - each one gets 20%
-  transaction = await token.transfer(investor1.address, tokens(200000))
+  transaction = await token.transfer(investor1.address, tokens(300000))
   await transaction.wait()
 
-  transaction = await token.transfer(investor2.address, tokens(200000))
+  transaction = await token.transfer(investor2.address, tokens(250000))
   await transaction.wait()
 
   transaction = await token.transfer(investor3.address, tokens(200000))
+  await transaction.wait()
+
+  transaction = await token.transfer(investor4.address, tokens(150000))
+  await transaction.wait()
+
+  transaction = await token.transfer(investor5.address, tokens(100000))
   await transaction.wait()
 
   console.log(`Fetching dao...\n`)
@@ -61,15 +78,15 @@ async function main() {
       await transaction.wait()
 
       // Vote 1
-      transaction = await dao.connect(investor1).vote(i + 1)
+      transaction = await dao.connect(investor1).vote(i + 1, VoteType.For)
       await transaction.wait()
 
       // Vote 2
-      transaction = await dao.connect(investor2).vote(i + 1)
+      transaction = await dao.connect(investor2).vote(i + 1, VoteType.For)
       await transaction.wait()
 
       // Vote 3
-      transaction = await dao.connect(investor3).vote(i + 1)
+      transaction = await dao.connect(investor3).vote(i + 1, VoteType.For)
       await transaction.wait()
 
       // Finalize
@@ -86,11 +103,11 @@ async function main() {
     await transaction.wait()
 
     // Vote 1
-    transaction = await dao.connect(investor2).vote(4)
+    transaction = await dao.connect(investor2).vote(4, VoteType.For)
     await transaction.wait()
 
     // Vote 2
-    transaction = await dao.connect(investor3).vote(4)
+    transaction = await dao.connect(investor3).vote(4, VoteType.Against)
     await transaction.wait()
 
     console.log(`Finished.\n`)

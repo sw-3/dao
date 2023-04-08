@@ -7,7 +7,6 @@ const tokens = (n) => {
 
 const ether = tokens
 
-
 const VoteType = {
   For: 0,
   Against: 1,

@@ -4,11 +4,17 @@ import { ethers } from 'ethers'
 
 const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
 
-	const voteHandler = async (id) => {
+	const VoteType = {
+	  For: 0,
+	  Against: 1,
+	  Abstain: 2
+	}
+
+	const voteHandler = async (id, _voteType) => {
 
 		try {
 			const signer = await provider.getSigner()
-			const transaction = await dao.connect(signer).vote(id)
+			const transaction = await dao.connect(signer).vote(id, _voteType)
 			await transaction.wait()
 		} catch {
 			window.alert('User rejected or transaction reverted')
@@ -52,24 +58,34 @@ const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
 						<td>{proposal.recipient}</td>
 						<td>{ethers.utils.formatUnits(proposal.amount, 'ether')} ETH</td>
 						<td>{proposal.finalized ? 'Approved' : 'In Progress'}</td>
-						<td>{proposal.votes.toString()}</td>
+						<td>{ethers.utils.formatUnits(proposal.votesFor, 18)}</td>
 						<td>
 							{!proposal.finalized && (
 								<Button 
 									variant="primary" 
 									style={{ width: '100%' }}
-									onClick={() => voteHandler(proposal.id)}
-								>Vote</Button>
+									onClick={() => voteHandler(proposal.id, VoteType.For)}
+								>For</Button>
 							)}
 						</td>
 						<td>
-							{!proposal.finalized && proposal.votes > quorum && (
-								<Button 
-									variant="primary" 
-									style={{ width: '100%' }}
-									onClick={() => finalizeHandler(proposal.id)}
-								>Finalize</Button>
-							)}
+							{
+								!proposal.finalized
+								&&
+									(
+										proposal.votesFor
+											+ proposal.votesAgainst
+											+ proposal.votesAbstain
+									) > quorum
+								&&
+									(
+										<Button
+											variant="primary"
+											style={{ width: '100%' }}
+											onClick={() => finalizeHandler(proposal.id)}
+										>Finalize</Button>
+									)
+							}
 						</td>
 					</tr>
 				))}
