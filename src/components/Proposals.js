@@ -115,13 +115,15 @@ const Proposals = ({ provider, dao, proposals, quorum, maxVotes, setIsLoading })
 						</tr>
 
 						<tr key={index * 2}>
-							<td colSpan={8}>
+							<td> </td>
+							<td colSpan={7}>
 			          <Progress
 			            maxVotes={maxVotes}
 			            forVotes={proposal.votesFor}
 			            againstVotes={proposal.votesAgainst}
 			            abstainVotes={proposal.votesAbstain}
 			          />
+			          <p> </p>
 		          </td>
 						</tr>
 					</>
