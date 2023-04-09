@@ -77,23 +77,44 @@ async function main() {
       transaction = await dao.connect(investor1).createProposal(`Proposal ${i + 1}`, ether(100), recipient.address)
       await transaction.wait()
 
-      // Vote 1
-      transaction = await dao.connect(investor1).vote(i + 1, VoteType.For)
-      await transaction.wait()
+      if (i < 2) {
+        // Vote 1
+        transaction = await dao.connect(investor1).vote(i + 1, VoteType.For)
+        await transaction.wait()
 
-      // Vote 2
-      transaction = await dao.connect(investor2).vote(i + 1, VoteType.For)
-      await transaction.wait()
+        // Vote 2
+        transaction = await dao.connect(investor2).vote(i + 1, VoteType.For)
+        await transaction.wait()
 
-      // Vote 3
-      transaction = await dao.connect(investor3).vote(i + 1, VoteType.For)
-      await transaction.wait()
+        // Vote 3
+        transaction = await dao.connect(investor3).vote(i + 1, VoteType.For)
+        await transaction.wait()
 
-      // Finalize
-      transaction = await dao.connect(investor1).finalizeProposal(i + 1)
-      await transaction.wait()
+        // Finalize
+        transaction = await dao.connect(investor1).finalizeProposal(i + 1)
+        await transaction.wait()
 
-      console.log(`Created & Finalized Proposal ${i + 1}\n`)
+        console.log(`Created & Finalized Proposal ${i + 1}\n`)
+      }
+      else {
+        // Vote 1
+        transaction = await dao.connect(investor1).vote(i + 1, VoteType.Against)
+        await transaction.wait()
+
+        // Vote 2
+        transaction = await dao.connect(investor2).vote(i + 1, VoteType.For)
+        await transaction.wait()
+
+        // Vote 3
+        transaction = await dao.connect(investor3).vote(i + 1, VoteType.Abstain)
+        await transaction.wait()
+
+        // Finalize
+        transaction = await dao.connect(investor1).finalizeProposal(i + 1)
+        await transaction.wait()
+
+        console.log(`Created & Finalized Proposal ${i + 1}\n`)
+      }
   }
 
     console.log(`Creating one more proposal...\n`)
