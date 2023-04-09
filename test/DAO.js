@@ -78,6 +78,10 @@ describe('DAO', () => {
       expect(await dao.quorum()).to.equal('500000000000000000000001')
     })
 
+    it('returns maxVotes', async () => {
+      expect(await dao.maxVotes()).to.equal('1000000000000000000000000')
+    })
+
   })
 
 

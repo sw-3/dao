@@ -20,10 +20,9 @@ function App() {
   const [treasuryBalance, setTreasuryBalance] = useState(0)
 
   const [account, setAccount] = useState(null)
-
   const [proposals, setProposals] = useState(null)
-
   const [quorum, setQuorum] = useState(null)
+  const [maxVotes, setMaxVotes] = useState(0)
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -53,11 +52,13 @@ function App() {
       const proposal = await dao.proposals(i+1)
       items.push(proposal)
     }
-
     setProposals(items)
 
     // fetch quorum
     setQuorum(await dao.quorum())
+
+    // fetch maxVotes
+    setMaxVotes(await dao.maxVotes())
 
     setIsLoading(false)
   }
@@ -96,6 +97,7 @@ function App() {
             dao={dao}
             proposals={proposals}
             quorum={quorum}
+            maxVotes={maxVotes}
             setIsLoading={setIsLoading}
           />
         </>

@@ -2,7 +2,10 @@ import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { ethers } from 'ethers'
 
-const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
+// components
+import Progress from './Progress'
+
+const Proposals = ({ provider, dao, proposals, quorum, maxVotes, setIsLoading }) => {
 
 	const VoteType = {
 	  For: 0,
@@ -52,64 +55,78 @@ const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
 			</thead>
 			<tbody>
 				{proposals.map((proposal, index) => (
-					<tr key={index}>
-						<td>{proposal.id.toString()}</td>
-						<td>{proposal.name}</td>
-						<td>{proposal.recipient}</td>
-						<td>{ethers.utils.formatUnits(proposal.amount, 'ether')} ETH</td>
-						<td>{!proposal.finalized ? 'In Progress'
-							: proposal.votesFor.gt(proposal.votesAgainst) ? 'Passed'
-							: 'Failed'
-						}</td>
-						<td>{ethers.utils.formatUnits(
-									proposal.votesFor.add(proposal.votesAgainst).add(proposal.votesAbstain),
-									18)}
-						</td>
-						<td>
-							{!proposal.finalized && (
-								<Button
-									variant="primary"
-									style={{ width: '30%', backgroundColor: 'green' }}
-									onClick={() => voteHandler(proposal.id, VoteType.For)}
-								>
-									For
-								</Button>
-							)}
-							{!proposal.finalized && (
-								<Button className='mx-2'
-									variant="primary"
-									style={{ width: '30%', backgroundColor: 'red' }}
-									onClick={() => voteHandler(proposal.id, VoteType.Against)}
-								>
-									Against
-								</Button>
-							)}
-							{!proposal.finalized && (
-								<Button
-									variant="primary"
-									style={{ width: '30%', backgroundColor: 'gray' }}
-									onClick={() => voteHandler(proposal.id, VoteType.Abstain)}
-								>
-									Abstain
-								</Button>
-							)}
-						</td>
-						<td>
-							{!proposal.finalized &&
-								proposal.votesFor.add(proposal.votesAgainst).add(proposal.votesAbstain).gt(quorum)
-								&& (
+					<>
+						<tr key={(index * 2) - 1}>
+							<td>{proposal.id.toString()}</td>
+							<td>{proposal.name}</td>
+							<td>{proposal.recipient}</td>
+							<td>{ethers.utils.formatUnits(proposal.amount, 'ether')} ETH</td>
+							<td>{!proposal.finalized ? 'In Progress'
+								: proposal.votesFor.gt(proposal.votesAgainst) ? 'Passed'
+								: 'Failed'
+							}</td>
+							<td>{ethers.utils.formatUnits(
+										proposal.votesFor.add(proposal.votesAgainst).add(proposal.votesAbstain),
+										18)}
+							</td>
+							<td>
+								{!proposal.finalized && (
 									<Button
-										variant="primary"
-										style={{ width: '100%' }}
-										onClick={() => finalizeHandler(proposal.id)}
+										variant="success"
+										style={{ width: '30%' }}
+										onClick={() => voteHandler(proposal.id, VoteType.For)}
 									>
-										Finalize
+										For
 									</Button>
-								)
-							}
-						</td>
-					</tr>
+								)}
+								{!proposal.finalized && (
+									<Button className='mx-2'
+										variant="danger"
+										style={{ width: '30%' }}
+										onClick={() => voteHandler(proposal.id, VoteType.Against)}
+									>
+										Against
+									</Button>
+								)}
+								{!proposal.finalized && (
+									<Button
+										variant="info"
+										style={{ width: '30%' }}
+										onClick={() => voteHandler(proposal.id, VoteType.Abstain)}
+									>
+										Abstain
+									</Button>
+								)}
+							</td>
+							<td>
+								{!proposal.finalized &&
+									proposal.votesFor.add(proposal.votesAgainst).add(proposal.votesAbstain).gt(quorum)
+									&& (
+										<Button
+											variant="primary"
+											style={{ width: '100%' }}
+											onClick={() => finalizeHandler(proposal.id)}
+										>
+											Finalize
+										</Button>
+									)
+								}
+							</td>
+						</tr>
+
+						<tr key={index * 2}>
+							<td colSpan={8}>
+			          <Progress
+			            maxVotes={maxVotes}
+			            forVotes={proposal.votesFor}
+			            againstVotes={proposal.votesAgainst}
+			            abstainVotes={proposal.votesAbstain}
+			          />
+		          </td>
+						</tr>
+					</>
 				))}
+
 			</tbody>
 		</Table>
 	);

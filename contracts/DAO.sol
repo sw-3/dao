@@ -8,6 +8,7 @@ contract DAO {
     address owner;
     Token public token;
     uint256 public quorum;
+    uint256 public maxVotes;
 
     struct Proposal {
         uint256 id;
@@ -50,6 +51,8 @@ contract DAO {
         owner = msg.sender;
         token = _token;
         quorum = _quorum;
+        // assume maxVotes = total supply; and quorum is half total supply + 1 wei.
+        maxVotes = (quorum - 1) * 2;
     }
 
     // allow contract to receive ether
