@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "./Token.sol";
 
 contract DAO {
@@ -25,7 +24,7 @@ contract DAO {
     uint256 public proposalCount;
 
     mapping(uint256 => Proposal) public proposals;
-    mapping(address => mapping(uint256 => bool)) hasVoted;
+    mapping(address => mapping(uint256 => bool)) public hasVoted;
 
     enum VoteType { For, Against, Abstain }
 

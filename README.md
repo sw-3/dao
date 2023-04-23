@@ -1,6 +1,6 @@
 # Sample DAO Project
 
-This project demonstrates a basic DAO contract with a front end.
+This project demonstrates a basic DAO contract using a custom token, with a front end for voting.
 
 ## Technologies Used
 

@@ -31,8 +31,12 @@ function App() {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     setProvider(provider)
 
+    const { chainId } = await provider.getNetwork()
+    // console.log(`chainId = ${chainId}`)
+    // setChainId(chainId)
+
     // initiate contracts
-    const dao = new ethers.Contract(config[31337].dao.address, DAO_ABI, provider)
+    const dao = new ethers.Contract(config[chainId].dao.address, DAO_ABI, provider)
     setDao(dao)
 
     let treasuryBalance = await provider.getBalance(dao.address)

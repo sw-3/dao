@@ -17,9 +17,23 @@ const Proposals = ({ provider, dao, proposals, quorum, maxVotes, setIsLoading })
 
 		try {
 			const signer = await provider.getSigner()
-			const transaction = await dao.connect(signer).vote(id, _voteType)
-			await transaction.wait()
+			console.log(`entering vote handler`)
+			const signerAddress = await signer.getAddress()
+			console.log(`signerAddress = ${signerAddress}`)
+			const hasVoted = await dao.hasVoted(signerAddress)
+			console.log(`hasVoted = ${hasVoted}`)
+//			if (hasVoted) {
+//				window.alert('You have already voted for that proposal.')
+//			}
+//			else if ( false ) {
+//				window.alert('alert msg')
+//			}
+//			else{
+				const transaction = await dao.connect(signer).vote(id, _voteType)
+				await transaction.wait()
+//			}
 		} catch {
+			// can we get back the error message from the contract, and give it here??
 			window.alert('User rejected or transaction reverted')
 		}
 
