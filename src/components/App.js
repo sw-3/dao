@@ -10,12 +10,14 @@ import Loading from './Loading'
 
 // ABIs: Import your contract ABIs here
 import DAO_ABI from '../abis/DAO.json'
+import TOKEN_ABI from '../abis/Token.json'
 
 // Config: Import your network config here
 import config from '../config.json';
 
 function App() {
   const [provider, setProvider] = useState(null)
+  const [token, setToken] = useState(null)
   const [dao, setDao] = useState(null)
   const [treasuryBalance, setTreasuryBalance] = useState(0)
 
@@ -32,12 +34,12 @@ function App() {
     setProvider(provider)
 
     const { chainId } = await provider.getNetwork()
-    // console.log(`chainId = ${chainId}`)
-    // setChainId(chainId)
 
     // initiate contracts
     const dao = new ethers.Contract(config[chainId].dao.address, DAO_ABI, provider)
     setDao(dao)
+    const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
+    setToken(token)
 
     let treasuryBalance = await provider.getBalance(dao.address)
     treasuryBalance = ethers.utils.formatUnits(treasuryBalance, 18)
@@ -99,6 +101,7 @@ function App() {
           <Proposals 
             provider={provider}
             dao={dao}
+            token={token}
             proposals={proposals}
             quorum={quorum}
             maxVotes={maxVotes}

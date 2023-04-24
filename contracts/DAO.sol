@@ -24,7 +24,7 @@ contract DAO {
     uint256 public proposalCount;
 
     mapping(uint256 => Proposal) public proposals;
-    mapping(address => mapping(uint256 => bool)) public hasVoted;
+    mapping(address => mapping(uint256 => bool)) hasVoted;
 
     enum VoteType { For, Against, Abstain }
 
@@ -102,12 +102,12 @@ contract DAO {
         ) 
         external onlyInvestor {
 
-        // fetch the proposal from the mapping
-        // NOTE: 'storage' causes any updates to be stored back in mapping
-        Proposal storage proposal = proposals[_id];
-
         // prevent double-voting
         require(!hasVoted[msg.sender][_id], "Already voted.");
+
+        // fetch the proposal from the mapping
+        // NOTE: 'storage' causes any updates to be stored back to blockchian
+        Proposal storage proposal = proposals[_id];
 
         // update votes
         uint256 tokenBalance = token.balanceOf(msg.sender);
@@ -131,6 +131,14 @@ contract DAO {
 
         // emit an event
         emit Vote(_id, msg.sender, _voteType);
+    }
+
+    // return whether an address has voted already on a prop
+    function hasVotedOnProposal(address _voter, uint256 _id)
+        public view
+        returns(bool) {
+
+        return hasVoted[_voter][_id];
     }
 
     // finalize proposal

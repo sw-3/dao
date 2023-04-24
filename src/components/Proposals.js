@@ -5,7 +5,14 @@ import { ethers } from 'ethers'
 // components
 import Progress from './Progress'
 
-const Proposals = ({ provider, dao, proposals, quorum, maxVotes, setIsLoading }) => {
+const Proposals = ({
+	provider,
+	dao,
+	token,
+	proposals,
+	quorum,
+	maxVotes,
+	setIsLoading }) => {
 
 	const VoteType = {
 	  For: 0,
@@ -17,23 +24,27 @@ const Proposals = ({ provider, dao, proposals, quorum, maxVotes, setIsLoading })
 
 		try {
 			const signer = await provider.getSigner()
-			console.log(`entering vote handler`)
 			const signerAddress = await signer.getAddress()
-			console.log(`signerAddress = ${signerAddress}`)
-			const hasVoted = await dao.hasVoted(signerAddress)
-			console.log(`hasVoted = ${hasVoted}`)
-//			if (hasVoted) {
-//				window.alert('You have already voted for that proposal.')
-//			}
+
+			// ensure the connected account is an investor in the project
+			const balance = await token.balanceOf(signerAddress)
+
+			if (balance <= 0) {
+				const symbol = await token.symbol();
+				window.alert(`You must own ${symbol} tokens to vote.`)
+			}
+			// ensure voter has not already voted
+			else if (await dao.hasVotedOnProposal(signerAddress, id)) {
+				window.alert('You have already voted for that proposal.')
+			}
 //			else if ( false ) {
 //				window.alert('alert msg')
 //			}
-//			else{
+			else{
 				const transaction = await dao.connect(signer).vote(id, _voteType)
 				await transaction.wait()
-//			}
+			}
 		} catch {
-			// can we get back the error message from the contract, and give it here??
 			window.alert('User rejected or transaction reverted')
 		}
 
