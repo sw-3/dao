@@ -37,10 +37,7 @@ const Proposals = ({
 			else if (await dao.hasVotedOnProposal(signerAddress, id)) {
 				window.alert('You have already voted for that proposal.')
 			}
-//			else if ( false ) {
-//				window.alert('alert msg')
-//			}
-			else{
+			else {
 				const transaction = await dao.connect(signer).vote(id, _voteType)
 				await transaction.wait()
 			}

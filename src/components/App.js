@@ -88,6 +88,7 @@ function App() {
           <Create
             provider={provider}
             dao={dao}
+            token={token}
             setIsLoading={setIsLoading}
           />
 

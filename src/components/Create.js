@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner'
 import { ethers } from 'ethers'
 
-const Create = ({ provider, dao, setIsLoading }) => {
+const Create = ({ provider, dao, token, setIsLoading }) => {
 
 	const [name, setName] = useState('')
 	const [amount, setAmount] = useState(0)
@@ -17,10 +17,21 @@ const Create = ({ provider, dao, setIsLoading }) => {
 
 		try {
 			const signer = await provider.getSigner()
-			const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
-			const transaction =
+			const signerAddress = await signer.getAddress()
+
+			// ensure the connected account is an investor in the project
+			const balance = await token.balanceOf(signerAddress)
+
+			if (balance <= 0) {
+				const symbol = await token.symbol();
+				window.alert(`You must own ${symbol} tokens to create a proposal.`)
+			}
+			else {
+			    const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
+			    const transaction =
 						await dao.connect(signer).createProposal(name, formattedAmount, address)
-			await transaction.wait()
+			    await transaction.wait()
+			}
 		} catch {
 			window.alert('User rejected or transaction reverted')
 		}
