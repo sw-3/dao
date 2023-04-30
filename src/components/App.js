@@ -14,11 +14,16 @@ import TOKEN_ABI from '../abis/Token.json'
 
 // Config: Import your network config here
 import config from '../config.json';
+const LOGO_COLOR = '#0f2a87'
 
 function App() {
   const [provider, setProvider] = useState(null)
   const [token, setToken] = useState(null)
+  const [tokenName, setTokenName] = useState(null)
+  const [tokenSymbol, setTokenSymbol] = useState(null)
+  const [tokenAddress, setTokenAddress] = useState(null)
   const [dao, setDao] = useState(null)
+  const [daoAddress, setDaoAddress] = useState(null)
   const [treasuryBalance, setTreasuryBalance] = useState(0)
 
   const [account, setAccount] = useState(null)
@@ -38,8 +43,16 @@ function App() {
     // initiate contracts
     const dao = new ethers.Contract(config[chainId].dao.address, DAO_ABI, provider)
     setDao(dao)
+    const daoAddress = dao.address
+    setDaoAddress(daoAddress)
     const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
     setToken(token)
+    const tokenAddress = token.address
+    setTokenAddress(tokenAddress)
+    const tokenName = await token.name()
+    setTokenName(tokenName)
+    const tokenSymbol = await token.symbol()
+    setTokenSymbol(tokenSymbol)
 
     let treasuryBalance = await provider.getBalance(dao.address)
     treasuryBalance = ethers.utils.formatUnits(treasuryBalance, 18)
@@ -77,14 +90,38 @@ function App() {
 
   return(
     <Container>
-      <Navigation account={account} />
+      <Navigation />
 
-      <h1 className='my-4 text-center'>Welcome to our DAO!</h1>
+      <h1 className='my-4 text-center' style={{ color: LOGO_COLOR }}>Welcome to our DAO!</h1>
 
       {isLoading ? (
         <Loading />
       ) : (
         <>
+          <p className='text-center'>
+            You must own <strong style={{ color: LOGO_COLOR }}>{tokenName} </strong> 
+            to participate in the DAO. <i>Get some here:</i> {`< link coming soon >`}
+          </p>
+          <p className='text-center'>
+            <strong className='mx-2'>DAO Contract Address on Sepolia:</strong> {daoAddress}
+          </p>
+
+          <hr />
+
+          <h5 className='text-center' style={{ color: LOGO_COLOR }}>
+            THIS DAO IS FOR EDUCATIONAL PURPOSES ONLY.
+          </h5>
+          <p className='text-center' style={{ width: '80%', marginLeft: '10%', marginRight: '-10%' }}>
+            Once you have {tokenSymbol} tokens in your wallet, you can vote and create 
+            new proposals. Each token you hold counts as 1 vote. It takes > 50% of the total supply 
+            (500,000 tokens) to reach a quorum. <strong>Abstain</strong> votes count toward the quorum only.
+          </p>
+          <p className='text-center' style={{ width: '80%', marginLeft: '10%', marginRight: '-10%' }}>
+            When creating proposals, the "amount" and "address" are the amount of sepoliaETH that will 
+            be paid from the DAO Treasury, to the specified wallet address, once the proposal 
+            is Finalized. A proposal can only be finalized if it passes.<br />
+          </p>
+
           <Create
             provider={provider}
             dao={dao}

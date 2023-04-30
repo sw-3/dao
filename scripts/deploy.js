@@ -11,12 +11,19 @@ async function main() {
   const SYMBOL = 'SW3'
   const MAX_SUPPLY = '1000000'
 
-  // Deploy Token
   const Token = await hre.ethers.getContractFactory('Token')
-  let token = await Token.deploy(NAME, SYMBOL, MAX_SUPPLY)
+  
+  // comment out this block, if deploying the new token above for the dao
+  // Fill in the deployed token address, to attach to existing token
+  const tokenAddr = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+  let token = Token.attach(tokenAddr)
+  console.log(`Attached to Token deployed at: ${token.address}\n`)
 
-  await token.deployed()
-  console.log(`Token deployed to: ${token.address}\n`)
+  // comment out this block, if attaching the contract to an existing token
+  // deploy token
+  // let token = await Token.deploy(NAME, SYMBOL, MAX_SUPPLY)
+  // await token.deployed()
+  // console.log(`Token deployed to: ${token.address}\n`)
 
   // deploy DAO
   const DAO = await hre.ethers.getContractFactory('DAO')
