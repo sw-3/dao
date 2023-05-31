@@ -21,12 +21,10 @@ function App() {
   const [token, setToken] = useState(null)
   const [tokenName, setTokenName] = useState(null)
   const [tokenSymbol, setTokenSymbol] = useState(null)
-  const [tokenAddress, setTokenAddress] = useState(null)
   const [dao, setDao] = useState(null)
   const [daoAddress, setDaoAddress] = useState(null)
   const [treasuryBalance, setTreasuryBalance] = useState(0)
 
-  const [account, setAccount] = useState(null)
   const [proposals, setProposals] = useState(null)
   const [quorum, setQuorum] = useState(null)
   const [maxVotes, setMaxVotes] = useState(0)
@@ -47,8 +45,6 @@ function App() {
     setDaoAddress(daoAddress)
     const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
     setToken(token)
-    const tokenAddress = token.address
-    setTokenAddress(tokenAddress)
     const tokenName = await token.name()
     setTokenName(tokenName)
     const tokenSymbol = await token.symbol()
@@ -57,11 +53,6 @@ function App() {
     let treasuryBalance = await provider.getBalance(dao.address)
     treasuryBalance = ethers.utils.formatUnits(treasuryBalance, 18)
     setTreasuryBalance(treasuryBalance)
-
-    // Fetch accounts
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-    const account = ethers.utils.getAddress(accounts[0])
-    setAccount(account)
 
     // fetch proposals
     const count = await dao.proposalCount()
@@ -100,7 +91,7 @@ function App() {
         <>
           <p className='text-center'>
             You must own <strong style={{ color: LOGO_COLOR }}>{tokenName} </strong> 
-            to participate in the DAO. <i>Get some here:</i>
+            to participate in the DAO. <i>Get some here: </i>
             <a href='https://divine-mouse-6272.on.fleek.co/' target='_blank' rel='noreferrer'>
               SW3 Token ICO</a>
           </p>
