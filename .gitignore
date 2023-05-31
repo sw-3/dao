@@ -5,6 +5,7 @@ coverage.json
 typechain
 typechain-types
 sw3_fund_dao.js
+sw3_deploy.js
 
 #Hardhat files
 cache

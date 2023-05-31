@@ -7,20 +7,12 @@
       "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
     }
   },
-  "5": {
-    "token": {
-      "address": ""
-    },
-    "dao": {
-      "address": ""
-    }
-  },
   "11155111": {
     "token": {
-      "address": ""
+      "address": "0x9f5F9EbBda30279E0cfE80C92269a034C636D51f"
     },
     "dao": {
-      "address": ""
+      "address": "0x7d30535F61bd829884515f10c17B3D2cd2428707"
     }
   },
   "80001": {
