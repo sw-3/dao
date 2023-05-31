@@ -50,7 +50,10 @@ const Create = ({ provider, dao, token, setIsLoading }) => {
 				/>
 				<Form.Control
 					type='number'
-					placeholder='Enter amount'
+					step='0.01'
+					min='0'
+					max='1'
+					placeholder='Enter amount between 0 and 1'
 					className='my-2'
 					onChange={(e) => setAmount(e.target.value)}
 				/>

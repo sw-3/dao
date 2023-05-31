@@ -45,7 +45,7 @@ async function main() {
   const token = await ethers.getContractAt('Token', config[chainId].token.address)
   console.log(`Token fetched: ${token.address}\n`)
 
-  // Send tokens to investors - each one gets 20%
+  // Send tokens to investors
   transaction = await token.transfer(investor1.address, tokens(300000))
   await transaction.wait()
 

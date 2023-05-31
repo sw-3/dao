@@ -66,7 +66,7 @@ const Proposals = ({
 			<thead>
 				<tr>
 					<th>#</th>
-					<th>Proposal Name</th>
+					<th style={{ width: '250px' }}>Proposal Name</th>
 					<th>Recipient Address</th>
 					<th>Amount</th>
 					<th>Status</th>
@@ -81,7 +81,7 @@ const Proposals = ({
 						<tr key={(index * 2) - 1}>
 							<td>{proposal.id.toString()}</td>
 							<td>{proposal.name}</td>
-							<td>{proposal.recipient}</td>
+							<td>{proposal.recipient.slice(0,5) + '...' + proposal.recipient.slice(38, 42)}</td>
 							<td>{ethers.utils.formatUnits(proposal.amount, 'ether')} ETH</td>
 							<td>{!proposal.finalized ? 'In Progress'
 								: proposal.votesFor.gt(proposal.votesAgainst) ? 'Passed'

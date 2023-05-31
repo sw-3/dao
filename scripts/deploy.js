@@ -7,6 +7,9 @@
 const hre = require("hardhat");
 
 async function main() {
+
+  console.log('\n\n\nDeploying DAO contract...\n')
+
   const NAME = 'ScottW3 Token'
   const SYMBOL = 'SW3'
   const MAX_SUPPLY = '1000000'
@@ -15,6 +18,7 @@ async function main() {
   
   // comment out this block, if deploying the new token above for the dao
   // Fill in the deployed token address, to attach to existing token
+  console.log(`Attaching to existing SW3 Token address...\n`)
   const tokenAddr = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
   let token = Token.attach(tokenAddr)
   console.log(`Attached to Token deployed at: ${token.address}\n`)
@@ -25,11 +29,13 @@ async function main() {
   // await token.deployed()
   // console.log(`Token deployed to: ${token.address}\n`)
 
-  // deploy DAO
+  console.log(`Deploying DAO contract...\n`)
   const DAO = await hre.ethers.getContractFactory('DAO')
   const dao = await DAO.deploy(token.address, '500000000000000000000001')
   await dao.deployed()
   console.log(`DAO deployed to: ${dao.address}\n`)
+
+  console.log(`Done.\n`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
