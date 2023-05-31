@@ -100,7 +100,9 @@ function App() {
         <>
           <p className='text-center'>
             You must own <strong style={{ color: LOGO_COLOR }}>{tokenName} </strong> 
-            to participate in the DAO. <i>Get some here:</i> {`< link coming soon >`}
+            to participate in the DAO. <i>Get some here:</i>
+            <a href='https://divine-mouse-6272.on.fleek.co/' target='_blank' rel='noreferrer'>
+              SW3 Token ICO</a>
           </p>
           <p className='text-center'>
             <strong className='mx-2'>DAO Contract Address on Sepolia:</strong> {daoAddress}
